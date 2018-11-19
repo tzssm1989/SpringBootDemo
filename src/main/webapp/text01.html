@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>face++人脸识别测试页</title>
+		<link rel="stylesheet" href="css/mybootstrap.css">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+
+	</head>
+	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+	<script>
+		var face_token;
+
+		function test() {
+			//			var form = new FormData(document.getElementById("form"));
+			var formData = new FormData();
+			formData.append('image_file', $('#InputFile1')[0].files[0]);
+			formData.append('api_key', 'mAvL7gjoWVkBJDFSmQL4-pQL0ig0NB1k');
+			formData.append('api_secret', 'M7egYDNWtPcQpNi_vl0KKlCM47Q7lZ3D');
+			$.ajax({
+				url: "https://api-cn.faceplusplus.com/facepp/v3/detect",
+				type: "post",
+				data: formData,
+				cache: false,
+				processData: false,
+				contentType: false,
+				success: function(data) {
+					//					alert(data.faces[0].face_token);
+					face_token = data.faces[0].face_token;
+					if(data.image_id != null) {
+						formData.delete('image_file');
+						formData.append("faceset_token", "35ae3dd027c2e4a82b23ba9f47389f62");
+						formData.append("face_tokens", data.faces[0].face_token);
+						$.ajax({
+							url: "https://api-cn.faceplusplus.com/facepp/v3/faceset/addface",
+							type: "post",
+							data: formData,
+							cache: false,
+							processData: false,
+							contentType: false,
+							success: function(data) {
+//								alert("添加成功");
+								$("#foot").append("<div class='col-md-3'><img src='" + url1 + "' width='200' height='200'>'" + face_token + "'</div>");
+
+							},
+							error: function(data) {
+								alert("添加失败");
+							}
+
+						});
+
+					}
+				},
+				error: function(e) {
+					alert(e);
+				}
+			});
+		}
+
+		function searchface() {
+
+			var formData = new FormData();
+			formData.append('image_file', $('#InputFile2')[0].files[0]);
+			formData.append('api_key', 'mAvL7gjoWVkBJDFSmQL4-pQL0ig0NB1k');
+			formData.append('api_secret', 'M7egYDNWtPcQpNi_vl0KKlCM47Q7lZ3D');
+			$.ajax({
+				url: "https://api-cn.faceplusplus.com/facepp/v3/detect",
+				type: "post",
+				data: formData,
+				cache: false,
+				processData: false,
+				contentType: false,
+				success: function(data) {
+					//					alert(data.faces[0].face_token);
+					if(data.image_id != null) {
+						formData.delete('image_file');
+						formData.append("faceset_token", "35ae3dd027c2e4a82b23ba9f47389f62");
+						formData.append("face_token", data.faces[0].face_token);
+						$.ajax({
+							url: "https://api-cn.faceplusplus.com/facepp/v3/search",
+							type: "post",
+							data: formData,
+							cache: false,
+							processData: false,
+							contentType: false,
+							success: function(data) {
+//								alert("检测成功");
+
+								$("#request_id").val(data.request_id);
+								$("#time_used").val(data.time_used);
+								$("#le3").val(data.thresholds['1e-3']);
+								$("#le4").val(data.thresholds['1e-4']);
+								$("#le5").val(data.thresholds['1e-5']);
+								$("#confidence").val(data.results[0].confidence);
+								$("#user_id").val(data.results[0].user_id);
+								$("#face_token").val(data.results[0].face_token);
+
+							},
+							error: function(data) {
+								alert("检测失败");
+							}
+
+						});
+
+					}
+				},
+				error: function(e) {
+					alert(e);
+				}
+			});
+
+		}
+
+		function clearimage() {
+			var formData = new FormData();
+			formData.append('api_key', 'mAvL7gjoWVkBJDFSmQL4-pQL0ig0NB1k');
+			formData.append('api_secret', 'M7egYDNWtPcQpNi_vl0KKlCM47Q7lZ3D');
+			formData.append("faceset_token", "35ae3dd027c2e4a82b23ba9f47389f62");
+			formData.append("face_tokens", "RemoveAllFaceTokens");
+
+			$.ajax({
+				url: "https://api-cn.faceplusplus.com/facepp/v3/faceset/removeface",
+				type: "post",
+				data: formData,
+				cache: false,
+				processData: false,
+				contentType: false,
+				success:function(data){
+					if(data.faceset_token != null){
+						alert("清空成功");
+					}
+					
+				},
+				error:function(e){
+					alert(e);
+				}
+			});
+
+		}
+
+		function getFileUrl(sourceId) {
+			var url;
+			if(navigator.userAgent.indexOf("MSIE") >= 1) { // IE 		
+				url = document.getElementById(sourceId).value;
+			} else if(navigator.userAgent.indexOf("Firefox") > 0) { // Firefox 		
+				url = window.URL.createObjectURL(document.getElementById(sourceId).files.item(0));
+			} else if(navigator.userAgent.indexOf("Chrome") > 0) { // Chrome 		
+				url = window.URL.createObjectURL(document.getElementById(sourceId).files.item(0));
+			}
+			return url;
+		}
+
+		var url1;
+
+		function preImg(sourceId, targetId) {
+			var url = getFileUrl(sourceId);
+			url1 = url;
+			var imgPre = document.getElementById(targetId);
+			imgPre.src = url;
+		}
+	</script>
+
+	<body>
+		<div class="container-fluidtop">
+			<div class="row">
+				<div class="col-md-3">
+					<form enctype="multipart/form-data" id="form1">
+						<label for="exampleInputFile">添加用户图片数据：</label>
+						<input type="file" id="InputFile1" onchange="preImg(this.id,'imgPre');">
+						<!--<input type="file" id="InputFile1">-->
+						<img id="imgPre" src="" width="50px" height="50px" style="display: block;" />
+						<input type="button" class="btn btn-success" id="buttion1" onclick="test()" value="提交">
+						<input type="button" class="btn btn-danger" id="buttion3" onclick="clearimage()" value="清空" />
+					</form>
+				</div>
+				<div class="col-md-3">
+					<form enctype="multipart/form-data" id="form2"></form>
+					<label for="exampleInputFile">比对图片：</label>
+					<input type="file" id="InputFile2" onchange="preImg(this.id,'imgPre2');">
+					<img id="imgPre2" src="" width="50px" height="50px" style="display: block;" />
+					<input type="button" class="btn btn-success" id="buttion2" onclick="searchface()" value="比对">
+				</div>
+				<div class="col-md-6">
+
+					<label for="exampleInputFile">比对结果是：</label> request_id :<input type="text" id="request_id" /><br /> time_used:
+					<input type="text" id="time_used" /><br /> thresholds:
+					<br /> le-3:
+					<input type="text" id="le3" /><br /> le-4:
+					<input type="text" id="le4" /><br /> le-5:
+					<input type="text" id="le5" /><br /> results:
+					<br /> confidence（置信度）:
+					<input type="text" id="confidence" /><br /> userid:
+					<input type="text" id="user_id" /><br /> face_token:
+					<input type="text" id="face_token" /><br />
+					如果confidence > 1e-5 则同一个人的可能信非常大<br />
+					如果confidence <	1e-3 则不认定为同一个人
+
+				</div>
+			</div>
+
+		</div>
+
+		<div class="container-fluidfoot" id="foot">
+
+		</div>
+	</body>
+
+</html>

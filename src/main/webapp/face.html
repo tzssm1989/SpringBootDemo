@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>人脸识别测试页</title>
+		<link rel="stylesheet" href="css/mybootstrap.css">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+
+	</head>
+	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+	<script>
+		$(document).ready(function() {
+
+			$("#buttion1").click(function() {
+				alert("123");
+				var formData = new FormData();
+				formData.append('image_file', $('#InputFile1')[0].files[0]);
+				formData.append('api_key', 'mAvL7gjoWVkBJDFSmQL4-pQL0ig0NB1k');
+				formData.append('api_secret', 'M7egYDNWtPcQpNi_vl0KKlCM47Q7lZ3D');
+                console.log(formData);
+               
+				$.ajax({
+					url: 'https://api-cn.faceplusplus.com/facepp/v3/detect',
+					type: 'POST',
+					async: false,
+					cache: false,
+					data: formData,
+					processData: false,
+					contentType: false,
+					success: function(data) {
+//						$("#foot").append("<div class='col-md-2'><img src='" + url1 + "' width='200' height='200'></div>");
+						alter("请求成功");
+					},
+					error: function(data) {
+						alter("请求失败");
+					}
+
+				});
+			
+				//					          location.reload();
+
+			});
+
+		});
+		
+		
+		function doUpload(){
+			
+			
+			
+		}
+
+		function getFileUrl(sourceId) {
+			var url;
+			if(navigator.userAgent.indexOf("MSIE") >= 1) { // IE 		
+				url = document.getElementById(sourceId).value;
+			} else if(navigator.userAgent.indexOf("Firefox") > 0) { // Firefox 		
+				url = window.URL.createObjectURL(document.getElementById(sourceId).files.item(0));
+			} else if(navigator.userAgent.indexOf("Chrome") > 0) { // Chrome 		
+				url = window.URL.createObjectURL(document.getElementById(sourceId).files.item(0));
+			}
+			return url;
+		}
+
+		var url1;
+
+		function preImg(sourceId, targetId) {
+			var url = getFileUrl(sourceId);
+			url1 = url;
+			var imgPre = document.getElementById(targetId);
+			imgPre.src = url;
+		}
+		
+		
+	</script>
+
+	<body>
+
+		<div class="container-fluidtop">
+			<div class="row">
+				<div class="col-md-3">
+					<form enctype="multipart/form-data" id='uploadForm'>
+						<label for="exampleInputFile">添加用户图片数据：</label>
+						<!--<input type="file" id="InputFile1" onchange="preImg(this.id,'imgPre');">-->
+						<input type="file" id="InputFile1">
+						<img id="imgPre" src="" width="50px" height="50px" style="display: block;" />
+						<input type="submit" id="buttion1" value="提交">
+					</form>
+				</div>
+				<div class="col-md-3">
+
+					<label for="exampleInputFile">比对图片：</label>
+					<input type="file" id="InputFile2">
+					<input type="button" id="buttion2" value="比对">
+				</div>
+				<div class="col-md-6">
+
+					<label for="exampleInputFile">比对结果是：</label>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="container-fluidfoot" id="foot">
+
+		</div>
+	</body>
+
+</html>

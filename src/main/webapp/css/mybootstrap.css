@@ -1,0 +1,13 @@
+.container-fluidtop div {
+
+    border: 1px red solid;
+    height: 300px;
+
+}
+
+.container-fluidfoot div {
+
+    border: 1px red solid;
+    height: 450p;
+
+}
